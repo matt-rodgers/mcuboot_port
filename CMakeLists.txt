@@ -25,38 +25,22 @@ add_compile_options(
     -Os
 )
 
-# List source files
-add_executable(${PROJECT_NAME}
-    ${CMAKE_SOURCE_DIR}/source/app_main.c
-    ${CMAKE_SOURCE_DIR}/source/LED_LedDriver.c
-    ${CMAKE_SOURCE_DIR}/source/board.c
-    ${CMAKE_SOURCE_DIR}/source/newlib_stubs.c
-)
+add_executable(${PROJECT_NAME})
 
-# Add subdirectories
-add_subdirectory(third-party/ST)
-target_link_libraries(${PROJECT_NAME} PRIVATE st)
+add_subdirectory(source)
+add_subdirectory(third-party)
 
-# List include directories
-target_include_directories(${PROJECT_NAME} PRIVATE
-    ${CMAKE_SOURCE_DIR}/source
-)
-
-# Define location of linker script. Note this is in ST subdirectory, not sure if there's
-# a better way to add this in the subdirectory's CMakeLists file.
-set(LINKER_SCRIPTS
-    ${CMAKE_SOURCE_DIR}/third-party/ST/STM32F446ZEHx_FLASH.ld
-)
+set(LINKER_SCRIPT ${CMAKE_SOURCE_DIR}/STM32F446ZETX_FLASH.ld)
 
 # Specify dependency of target on linker script
 set_target_properties(${PROJECT_NAME} PROPERTIES
     SUFFIX .elf
-    LINK_DEPENDS "${LINKER_SCRIPTS}"
+    LINK_DEPENDS "${LINKER_SCRIPT}"
 )
 
 # Linker options
 target_link_options(${PROJECT_NAME} PRIVATE
-    -T${CMAKE_SOURCE_DIR}/third-party/ST/STM32F446ZEHx_FLASH.ld
+    -T${LINKER_SCRIPT}
     LINKER:--print-memory-usage
     LINKER:-Map,${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.map
 )

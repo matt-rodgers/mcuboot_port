@@ -40,10 +40,6 @@ add_compile_definitions(
   EXTERNAL_CLOCK_VALUE=12288000
   HSI_VALUE=16000000
   LSI_VALUE=32000
-  VDD_VALUE=3300
-  PREFETCH_ENABLE=1
-  INSTRUCTION_CACHE_ENABLE=1
-  DATA_CACHE_ENABLE=1
 )
 
 # use this to avoid running the linker during test compilation
