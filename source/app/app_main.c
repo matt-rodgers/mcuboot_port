@@ -1,6 +1,6 @@
 #include "board.h"
 #include "LED_LedDriver.h"
-#include "stm32f4xx_ll_utils.h"
+#include "stm32f4xx_hal.h"
 #include "app_main.h"
 
 void app_main(void)
@@ -11,6 +11,6 @@ void app_main(void)
 	{
 		LED_Toggle(ledRed);
 
-		LL_mDelay(1000);
+		HAL_Delay(1000);
 	}
 }

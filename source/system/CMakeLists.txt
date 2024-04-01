@@ -11,4 +11,5 @@ target_sources(${PROJECT_NAME} PRIVATE
     syscalls.c
     sysmem.c
     system_stm32f4xx.c
+    stm32f4xx_it.c
 )

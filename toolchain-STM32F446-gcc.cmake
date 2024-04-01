@@ -31,15 +31,7 @@ add_compile_options(
 # Definitions copied from CubeMX project
 add_compile_definitions(
   STM32F446xx
-  USE_FULL_ASSERT
   USE_FULL_LL_DRIVER
-  HSE_VALUE=25000000
-  HSE_STARTUP_TIMEOUT=100
-  LSE_STARTUP_TIMEOUT=5000
-  LSE_VALUE=32768
-  EXTERNAL_CLOCK_VALUE=12288000
-  HSI_VALUE=16000000
-  LSI_VALUE=32000
 )
 
 # use this to avoid running the linker during test compilation
