@@ -19,6 +19,8 @@ target_sources(${PROJECT_NAME} PRIVATE
     stm32f4xx_hal_driver/Src/stm32f4xx_hal.c
     stm32f4xx_hal_driver/Src/stm32f4xx_hal_cortex.c
     stm32f4xx_hal_driver/Src/stm32f4xx_hal_rcc.c
+    stm32f4xx_hal_driver/Src/stm32f4xx_hal_gpio.c
+    stm32f4xx_hal_driver/Src/stm32f4xx_hal_uart.c
     stm32f4xx_hal_driver/Src/stm32f4xx_ll_gpio.c
     stm32f4xx_hal_driver/Src/stm32f4xx_ll_utils.c
 )
