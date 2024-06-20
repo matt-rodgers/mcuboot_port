@@ -1,3 +1,5 @@
+JLINK_CMD = JLinkExe -device STM32F446ZE -if SWD -speed 4000 -autoconnect 1
+
 # Make application
 .PHONY: app
 app:
@@ -8,3 +10,7 @@ app:
 .PHONY: clean
 clean:
 	rm -rf build
+
+.PHONY: flash
+flash:
+	$(JLINK_CMD) -commandfile flash.jlink

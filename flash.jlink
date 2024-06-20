@@ -1,0 +1,5 @@
+h
+loadfile build/application.elf 0x08000000 noreset
+r
+g
+q
