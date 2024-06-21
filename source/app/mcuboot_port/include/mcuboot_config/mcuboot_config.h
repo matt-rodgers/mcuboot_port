@@ -46,8 +46,6 @@
  * the default upgrade mode.
  */
 
-#define MCUBOOT_SWAP_USING_MOVE 1
-
 /* Uncomment to enable the overwrite-only code path. */
 /* #define MCUBOOT_OVERWRITE_ONLY */
 
@@ -95,7 +93,7 @@
 
 /* Default maximum number of flash sectors per image slot; change
  * as desirable. */
-#define MCUBOOT_MAX_IMG_SECTORS 128
+#define MCUBOOT_MAX_IMG_SECTORS 8
 
 /* Default number of separately updateable images; change in case of
  * multiple images. */

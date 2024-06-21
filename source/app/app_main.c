@@ -17,14 +17,9 @@ void app_main(void)
 
 	struct boot_rsp br;
 	int ret = boot_go(&br);
-	if (0 != ret)
-	{
-		LOG("boot_go failed with error code %d\n", ret);
-	}
-	else
-	{
-		LOG("boot_go completed successfully\n");
-	}
+
+	HAL_Delay(5000);
+	LOG("boot_go returned %d\n", ret);
 
 	while (1)
 	{

@@ -74,9 +74,6 @@ int flash_area_get_sectors(int fa_id, uint32_t *count,
                            struct flash_sector *sectors);
 
 //! Retrieve the flash sector a given offset belongs to.
-int flash_area_sector_from_off(uint32_t off, struct flash_sector *sector);
-
-//! Retrieve the flash sector a given offset belongs to.
 int flash_area_get_sector(const struct flash_area *area, uint32_t off,
                           struct flash_sector *sector);
 
@@ -86,6 +83,5 @@ int flash_area_get_sector(const struct flash_area *area, uint32_t off,
 //!  relevant only when multi-image support support is enabled
 int flash_area_id_from_multi_image_slot(int image_index, int slot);
 int flash_area_id_from_image_slot(int slot);
-int flash_area_to_sectors(int idx, int *cnt, struct flash_area *fa);
 
 #endif /* _FLASH_MAP_BACKEND */
