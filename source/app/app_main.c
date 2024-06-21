@@ -4,12 +4,14 @@
 #include "led.h"
 #include "log.h"
 #include "bootutil/bootutil.h"
+#include "sysflash/sysflash.h"
+#include "core_cm4.h"
 #include "app_main.h"
+
+typedef void (*app_entry_t)(void);
 
 void app_main(void)
 {
-	uint32_t delay_period = 1000;
-
 	led_init();
 	serial_init();
 
@@ -22,21 +24,36 @@ void app_main(void)
 	if (ret) {
 		LOG("No bootable image\n");
 
-		/* Set a fast LED flash to indicate error */
-		delay_period = 100;
+		/* Fast flash LED to indicate issue */
+		while (1) {
+			led_toggle();
+			HAL_Delay(100);
+		}
 	}
 
-	/* Boot the specified image */
-	
+	/* We have a bootable image, start it */
+	ASSERT(FLASH_DEVICE_INTERNAL_FLASH == br.br_flash_dev_id);
+	uint32_t vector_table = FLASH_DEVICE_INTERNAL_FLASH_BASE + br.br_image_off + br.br_hdr->ih_hdr_size;
+	uint32_t app_sp = vector_table;
+	app_entry_t app_entry = (app_entry_t)(vector_table + 4);
 
-	while (1)
-	{
-		led_toggle();
-		LOG("toggle\n");
+	LOG("Got bootable image with sp 0x%x, pc 0x%x\n", app_sp, app_entry);
 
-		const char * message = "hello world\n";
-		serial_write((const uint8_t *)message, (uint16_t)strlen(message));
+	/* TODO de-initialise peripherals */
 
-		HAL_Delay(delay_period);
-	}
+	/* Disable interrupts */
+	__disable_irq();
+
+	/* Update vector table offset */
+	SCB->VTOR = vector_table;
+	__DSB();
+
+	/* Set stack pointer */
+	__set_MSP(*(uint32_t *)app_sp);
+
+	/* Jump to application */
+	app_entry();
+
+	/* Should not get here! */
+	ASSERT(0);
 }
