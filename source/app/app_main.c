@@ -8,6 +8,8 @@
 
 void app_main(void)
 {
+	uint32_t delay_period = 1000;
+
 	led_init();
 	serial_init();
 
@@ -17,9 +19,15 @@ void app_main(void)
 
 	struct boot_rsp br;
 	int ret = boot_go(&br);
+	if (ret) {
+		LOG("No bootable image\n");
 
-	HAL_Delay(5000);
-	LOG("boot_go returned %d\n", ret);
+		/* Set a fast LED flash to indicate error */
+		delay_period = 100;
+	}
+
+	/* Boot the specified image */
+	
 
 	while (1)
 	{
@@ -29,6 +37,6 @@ void app_main(void)
 		const char * message = "hello world\n";
 		serial_write((const uint8_t *)message, (uint16_t)strlen(message));
 
-		HAL_Delay(1000);
+		HAL_Delay(delay_period);
 	}
 }
