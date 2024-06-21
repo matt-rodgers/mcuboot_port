@@ -1,0 +1,5 @@
+h
+loadfile build/app_signed.bin 0x08020000 noreset
+r
+g
+q

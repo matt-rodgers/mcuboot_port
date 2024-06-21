@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.21)
 project(stm32-starter LANGUAGES C CXX ASM)
 
 # Set project name (used for naming output files)
-set(PROJECT_NAME application)
+set(PROJECT_NAME bootloader)
 
 # Set C and C++ standards
 set(CMAKE_C_STANDARD 11)
