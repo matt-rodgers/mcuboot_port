@@ -3,6 +3,7 @@
 #include "serial.h"
 #include "led.h"
 #include "log.h"
+#include "bootutil/bootutil.h"
 #include "app_main.h"
 
 void app_main(void)
@@ -12,7 +13,18 @@ void app_main(void)
 
 	led_off();
 
-	LOG("hello world\n");
+	LOG("Starting MCUboot\n");
+
+	struct boot_rsp br;
+	int ret = boot_go(&br);
+	if (0 != ret)
+	{
+		LOG("boot_go failed with error code %d\n", ret);
+	}
+	else
+	{
+		LOG("boot_go completed successfully\n");
+	}
 
 	while (1)
 	{
