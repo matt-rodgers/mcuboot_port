@@ -24,6 +24,7 @@ static inline uint8_t flash_area_get_device_id(const struct flash_area *fa)
 {
     return (uint8_t)fa->fa_device_id;
 }
+
 static inline uint32_t flash_area_get_off(const struct flash_area *fa)
 {
 	return (uint32_t)fa->fa_off;

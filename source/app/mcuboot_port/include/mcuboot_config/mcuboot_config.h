@@ -46,6 +46,8 @@
  * the default upgrade mode.
  */
 
+#define MCUBOOT_SWAP_USING_MOVE 1
+
 /* Uncomment to enable the overwrite-only code path. */
 /* #define MCUBOOT_OVERWRITE_ONLY */
 

@@ -10,8 +10,8 @@
     do { \
         if (!(cond)) { \
             LOG("[ASSERTION FAIL]: file " __FILE__ ", line " STRINGIZE(__LINE__) "\n"); \
+            while (1) {} \
         } \
-        while (1) {} \
     } while (0)
 
 #endif /* _MCUBOOT_ASSERT_H */
