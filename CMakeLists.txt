@@ -19,8 +19,7 @@ message(STATUS "Using toolchain file: ${CMAKE_TOOLCHAIN_FILE}")
 add_compile_options(
     -Wall
     -Wextra
-    -Wconversion
-    -Wsign-conversion
+    -Wno-old-style-declaration
     -g3
     -Os
 )
