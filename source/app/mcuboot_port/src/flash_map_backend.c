@@ -42,6 +42,7 @@ _Static_assert(APPLICATION_SECONDARY_START_ADDRESS + APPLICATION_SECONDARY_SIZE 
     "Application secondary and scratch overlap");
 
 #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof(arr[0]))
+#define IS_ALIGNED(addr, alignment) (0 == (addr) % (alignment))
 
 static const struct flash_area fa_bootloader = {
     .fa_id = FLASH_AREA_BOOTLOADER,
@@ -155,19 +156,80 @@ int flash_area_read(const struct flash_area *fa, uint32_t off,
 int flash_area_write(const struct flash_area *fa, uint32_t off,
                      const void *src, uint32_t len)
 {
-    (void)fa;
-    (void)off;
-    (void)src;
-    (void)len;
-    MCUBOOT_LOG_DBG("flash_area_write");
-    return -1;
+    if (NULL == fa || NULL == src) {
+        return -1;
+    }
+
+    if (FLASH_DEVICE_INTERNAL_FLASH != fa->fa_device_id) {
+        return -1;
+    }
+
+    uint32_t write_start = fa->fa_off + off;
+    uint32_t write_end   = fa->fa_off + off + len;
+
+    /* Determine best program size based on alignment of write */
+    const uint32_t alignments[] = {4, 2, 1};
+    const uint32_t program_types[] = {
+        FLASH_TYPEPROGRAM_WORD,
+        FLASH_TYPEPROGRAM_HALFWORD,
+        FLASH_TYPEPROGRAM_BYTE,
+    };
+
+    uint32_t alignment = 1;
+    uint32_t type_program = FLASH_TYPEPROGRAM_BYTE;
+
+    for (uint32_t i = 0; i < ARRAY_SIZE(alignments); i++) {
+        if (IS_ALIGNED(write_start, alignments[i]) && 
+            IS_ALIGNED(write_end, alignments[i]) &&
+            IS_ALIGNED((uint32_t)src, alignments[i])) {
+            alignment = alignments[i];
+            type_program = program_types[i];
+            break;
+        }
+    }
+
+    /* Determine number of writes */
+    uint32_t write_count = len / alignment;
+    
+    HAL_FLASH_Unlock();
+
+    for (uint32_t i = 0; i < write_count; i++) {
+        uint32_t dst = write_start + (i * alignment);
+        uint64_t data = 0;
+
+        switch (alignment) {
+            case 1:
+                data = *(uint8_t *)src;
+                break;
+            case 2:
+                data = *(uint16_t *)src;
+                break;
+            case 4:
+                data = *(uint32_t *)src;
+                break;
+            default:
+                ASSERT(0);
+                break;
+        }
+
+        int ret = HAL_FLASH_Program(type_program, dst, data);
+        if (0 != ret) {
+            MCUBOOT_LOG_ERR("Failed to program flash, err %d", ret);
+            HAL_FLASH_Lock();
+            return -1;
+        }
+
+        src += alignment;
+    }
+
+    HAL_FLASH_Lock();
+
+    return 0;
 }
 
 int flash_area_erase(const struct flash_area *fa,
                      uint32_t off, uint32_t len)
 {
-    MCUBOOT_LOG_DBG("flash_area_erase");
-
     /* Validate parameters and get sector information */
     if (NULL == fa) {
         return -1;
@@ -209,17 +271,16 @@ int flash_area_erase(const struct flash_area *fa,
         return -1;
     }
 
-    /* Unlock flash register access */
     HAL_FLASH_Unlock();
 
     uint32_t sector_error;
     int ret = HAL_FLASHEx_Erase(&erase_init, &sector_error);
     if (0 != ret) {
         MCUBOOT_LOG_ERR("Failed to erase flash, err %d", ret);
+        HAL_FLASH_Lock();
         return -1;
     }
 
-    /* Lock flash register access */
     HAL_FLASH_Lock();
 
     return 0;
