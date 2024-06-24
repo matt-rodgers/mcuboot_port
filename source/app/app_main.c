@@ -12,11 +12,6 @@ typedef void (*app_entry_t)(void);
 
 void app_main(void)
 {
-	led_init();
-	serial_init();
-
-	led_off();
-
 	LOG("Starting MCUboot\n");
 
 	struct boot_rsp br;
@@ -25,6 +20,8 @@ void app_main(void)
 		LOG("No bootable image\n");
 
 		/* Fast flash LED to indicate issue */
+		led_init();
+
 		while (1) {
 			led_toggle();
 			HAL_Delay(100);
@@ -33,9 +30,10 @@ void app_main(void)
 
 	/* We have a bootable image, start it */
 	ASSERT(FLASH_DEVICE_INTERNAL_FLASH == br.br_flash_dev_id);
-	uint32_t vector_table = FLASH_DEVICE_INTERNAL_FLASH_BASE + br.br_image_off + br.br_hdr->ih_hdr_size;
-	uint32_t app_sp = vector_table;
-	app_entry_t app_entry = (app_entry_t)(vector_table + 4);
+	uint32_t vector_table_addr = FLASH_DEVICE_INTERNAL_FLASH_BASE + br.br_image_off + br.br_hdr->ih_hdr_size;
+	uint32_t *vector_table = (uint32_t *)vector_table_addr;
+	uint32_t app_sp = vector_table[0];
+	app_entry_t app_entry = (app_entry_t)vector_table[1];
 
 	LOG("Got bootable image with sp 0x%x, pc 0x%x\n", app_sp, app_entry);
 
@@ -45,11 +43,11 @@ void app_main(void)
 	__disable_irq();
 
 	/* Update vector table offset */
-	SCB->VTOR = vector_table;
+	SCB->VTOR = vector_table_addr;
 	__DSB();
 
 	/* Set stack pointer */
-	__set_MSP(*(uint32_t *)app_sp);
+	__set_MSP(app_sp);
 
 	/* Jump to application */
 	app_entry();
