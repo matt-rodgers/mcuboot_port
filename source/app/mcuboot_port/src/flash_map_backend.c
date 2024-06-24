@@ -2,6 +2,8 @@
 #include "mcuboot_config/mcuboot_logging.h"
 #include "mcuboot_config/mcuboot_config.h"
 #include "sysflash/sysflash.h"
+#include "stm32f4xx_hal_flash.h"
+#include "stm32f4xx_hal_flash_ex.h"
 #include <string.h>
 
 /* STM32F446 flash layout:
@@ -38,6 +40,8 @@ _Static_assert(APPLICATION_PRIMARY_START_ADDRESS + APPLICATION_PRIMARY_SIZE <= A
     "Application primary and secondary overlap");
 _Static_assert(APPLICATION_SECONDARY_START_ADDRESS + APPLICATION_SECONDARY_SIZE <= SCRATCH_START_ADDRESS,
     "Application secondary and scratch overlap");
+
+#define ARRAY_SIZE(arr) (sizeof(arr) / sizeof(arr[0]))
 
 static const struct flash_area fa_bootloader = {
     .fa_id = FLASH_AREA_BOOTLOADER,
@@ -88,12 +92,12 @@ const struct flash_sector flash_sectors[] = {
     { .fs_off = 0x08060000, .fs_size = (128 * 1024) },
 };
 
-#define FLASH_SECTOR_COUNT (sizeof(flash_sectors) / sizeof(flash_sectors[0]))
+#define FLASH_SECTOR_COUNT ARRAY_SIZE(flash_sectors)
 _Static_assert(FLASH_SECTOR_COUNT <= MCUBOOT_MAX_IMG_SECTORS, "Too many flash sectors");
 
 static const struct flash_area * lookup_flash_area(uint8_t id)
 {
-    for (uint32_t i = 0; i < sizeof(flash_areas) / sizeof(flash_areas[0]); i++) {
+    for (uint32_t i = 0; i < ARRAY_SIZE(flash_areas); i++) {
         if (flash_areas[i]->fa_id == id) {
             return flash_areas[i];
         }
@@ -162,11 +166,63 @@ int flash_area_write(const struct flash_area *fa, uint32_t off,
 int flash_area_erase(const struct flash_area *fa,
                      uint32_t off, uint32_t len)
 {
-    (void)fa;
-    (void)off;
-    (void)len;
     MCUBOOT_LOG_DBG("flash_area_erase");
-    return -1;
+
+    /* Validate parameters and get sector information */
+    if (NULL == fa) {
+        return -1;
+    }
+
+    if (FLASH_DEVICE_INTERNAL_FLASH != fa->fa_device_id) {
+        return -1;
+    }
+
+    FLASH_EraseInitTypeDef erase_init = {
+        .TypeErase = FLASH_TYPEERASE_SECTORS,
+        .Sector = UINT32_MAX,
+        .NbSectors = 0,
+        .VoltageRange = FLASH_VOLTAGE_RANGE_3,
+    };
+
+    uint32_t erase_start = fa->fa_off + off;
+    for (uint32_t i = 0; i < FLASH_SECTOR_COUNT; i++) {
+        if (flash_sectors[i].fs_off == erase_start) {
+            erase_init.Sector = i;
+            break;
+        }
+    }
+
+    if (UINT32_MAX == erase_init.Sector) {
+        MCUBOOT_LOG_ERR("Erase does not start on a sector boundary");
+        return -1;
+    }
+
+    uint32_t erase_end = fa->fa_off + off + len;
+    for (uint32_t i = 0; i < FLASH_SECTOR_COUNT; i++) {
+        if (erase_end == flash_sectors[i].fs_off + flash_sectors[i].fs_size) {
+            erase_init.NbSectors = (i + 1) - erase_init.Sector;
+        }
+    }
+
+    if (erase_init.NbSectors > FLASH_SECTOR_COUNT) {
+        MCUBOOT_LOG_ERR("Erase does not end on a sector boundary");
+        return -1;
+    }
+
+    /* Unlock flash register access */
+    HAL_FLASH_Unlock();
+
+    uint32_t sector_error;
+    int ret = HAL_FLASHEx_Erase(&erase_init, &sector_error);
+    if (0 != ret) {
+        MCUBOOT_LOG_ERR("Failed to erase flash, err %d", ret);
+        return -1;
+    }
+
+    /* Lock flash register access */
+    HAL_FLASH_Lock();
+
+    return 0;
 }
 
 uint32_t flash_area_align(const struct flash_area *area)

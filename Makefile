@@ -24,6 +24,7 @@ sign_app:
 		--version 1.0.0 \
 		--pad-header \
 		--key key.pem \
+		--confirm \
 		~/software/starter-stm32/build-app/application.bin \
 		build/app_signed.bin
 

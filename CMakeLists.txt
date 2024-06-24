@@ -20,6 +20,7 @@ add_compile_options(
     -Wall
     -Wextra
     -Wno-old-style-declaration
+    -Wno-unused-parameter
     -g3
     -Os
 )
