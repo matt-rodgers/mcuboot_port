@@ -23,6 +23,7 @@ sign_app:
 		--slot-size 0x20000 \
 		--version 1.0.0 \
 		--pad-header \
+		--key key.pem \
 		~/software/starter-stm32/build-app/application.bin \
 		build/app_signed.bin
 

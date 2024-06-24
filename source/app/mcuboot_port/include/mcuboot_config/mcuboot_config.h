@@ -31,7 +31,7 @@
 /* #define MCUBOOT_SIGN_RSA */
 
 /* Uncomment for ECDSA signatures using curve P-256. */
-// #define MCUBOOT_SIGN_EC256
+#define MCUBOOT_SIGN_EC256
 
 
 /*
