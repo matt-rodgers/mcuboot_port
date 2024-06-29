@@ -2,6 +2,7 @@
 #include "stm32f4xx_hal.h"
 #include "serial.h"
 #include "led.h"
+#include "button.h"
 #include "log.h"
 #include "bootutil/bootutil.h"
 #include "sysflash/sysflash.h"
@@ -13,6 +14,16 @@ typedef void (*app_entry_t)(void);
 void app_main(void)
 {
 	LOG("Starting MCUboot\n");
+
+	button_init();
+
+	if (button_read()) {
+		LOG("Button state is 1\n");
+	} else {
+		LOG("Button state is 0\n");
+	}
+
+	HAL_Delay(5000);
 
 	struct boot_rsp br;
 	int ret = boot_go(&br);

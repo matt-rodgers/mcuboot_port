@@ -9,7 +9,9 @@
 
 void led_init(void)
 {
-    __HAL_RCC_GPIOB_CLK_ENABLE();
+    if (__HAL_RCC_GPIOB_IS_CLK_DISABLED()) {
+        __HAL_RCC_GPIOB_CLK_ENABLE();
+    }
 
     GPIO_InitTypeDef GPIO_InitStruct;
     memset(&GPIO_InitStruct, 0, sizeof(GPIO_InitStruct));

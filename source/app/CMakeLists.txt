@@ -9,6 +9,7 @@ target_sources(${PROJECT_NAME} PRIVATE
     app_main.c
     serial.c
     led.c
+    button.c
     mcuboot_port/src/keys.c
     mcuboot_port/src/flash_map_backend.c
 )
