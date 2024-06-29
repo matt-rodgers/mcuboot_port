@@ -9,46 +9,25 @@
 #include "core_cm4.h"
 #include "app_main.h"
 
+#define BTN_CHECK_INTV_MS   10
+#define BTN_PRESS_TOTAL_MS  500
+
 typedef void (*app_entry_t)(void);
 
-void app_main(void)
+static void start_app(struct boot_rsp *br)
 {
-	LOG("Starting MCUboot\n");
-
-	button_init();
-
-	if (button_read()) {
-		LOG("Button state is 1\n");
-	} else {
-		LOG("Button state is 0\n");
-	}
-
-	HAL_Delay(5000);
-
-	struct boot_rsp br;
-	int ret = boot_go(&br);
-	if (ret) {
-		LOG("No bootable image\n");
-
-		/* Fast flash LED to indicate issue */
-		led_init();
-
-		while (1) {
-			led_toggle();
-			HAL_Delay(100);
-		}
-	}
-
-	/* We have a bootable image, start it */
-	ASSERT(FLASH_DEVICE_INTERNAL_FLASH == br.br_flash_dev_id);
-	uint32_t vector_table_addr = FLASH_DEVICE_INTERNAL_FLASH_BASE + br.br_image_off + br.br_hdr->ih_hdr_size;
+	ASSERT(FLASH_DEVICE_INTERNAL_FLASH == br->br_flash_dev_id);
+	uint32_t vector_table_addr = FLASH_DEVICE_INTERNAL_FLASH_BASE + br->br_image_off + br->br_hdr->ih_hdr_size;
 	uint32_t *vector_table = (uint32_t *)vector_table_addr;
 	uint32_t app_sp = vector_table[0];
 	app_entry_t app_entry = (app_entry_t)vector_table[1];
 
 	LOG("Got bootable image with sp 0x%x, pc 0x%x\n", app_sp, app_entry);
 
-	/* TODO de-initialise peripherals */
+	/* De-initialise peripherals */
+	button_deinit();
+	led_deinit();
+	serial_deinit();
 
 	/* Disable interrupts */
 	__disable_irq();
@@ -65,4 +44,42 @@ void app_main(void)
 
 	/* Should not get here! */
 	ASSERT(0);
+}
+
+void app_main(void)
+{
+	LOG("Starting MCUboot\n");
+
+	/* Init peripherals */
+	button_init();
+	led_init();
+	serial_init();
+
+	/* Turn on indicator LED */
+	led_on();
+
+	bool serial_recovery_mode = true;
+	for (uint32_t i = 0; i < (BTN_PRESS_TOTAL_MS / BTN_CHECK_INTV_MS); i++) {
+		if (!button_read()) {
+			serial_recovery_mode = false;
+			break;
+		}
+
+		HAL_Delay(BTN_CHECK_INTV_MS);
+	}
+
+	if (!serial_recovery_mode) {
+		struct boot_rsp br = {0};
+		int ret = boot_go(&br);
+		if (0 == ret) {
+			start_app(&br);
+			/* start_app should not return */
+		}
+	}
+
+	/* Enter serial recovery mode */
+	while (1) {
+		led_toggle();
+		HAL_Delay(100);
+	}
 }

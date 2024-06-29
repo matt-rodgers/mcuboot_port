@@ -28,3 +28,13 @@ int button_read(void)
 {
     return HAL_GPIO_ReadPin(BTN_PORT, BTN_PIN);
 }
+
+int button_deinit(void)
+{
+    if (__HAL_RCC_GPIOC_IS_CLK_ENABLED()) {
+        HAL_GPIO_DeInit(BTN_PORT, BTN_PIN);
+        __HAL_RCC_GPIOC_CLK_DISABLE();
+    }
+
+    return 0;
+}

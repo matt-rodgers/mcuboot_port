@@ -36,3 +36,11 @@ void led_toggle(void)
 {
     HAL_GPIO_TogglePin(LED_PORT, LED_PIN);
 }
+
+void led_deinit(void)
+{
+    if (__HAL_RCC_GPIOB_IS_CLK_ENABLED()) {
+        HAL_GPIO_DeInit(LED_PORT, LED_PIN);
+        __HAL_RCC_GPIOB_CLK_DISABLE();
+    }
+}

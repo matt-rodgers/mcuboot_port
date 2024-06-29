@@ -30,6 +30,11 @@ void serial_write(const uint8_t * msg, uint16_t len)
     HAL_UART_Transmit(&serial_uart_handle, msg, len, UINT32_MAX);
 }
 
+void serial_deinit(void)
+{
+	HAL_UART_DeInit(&serial_uart_handle);
+}
+
 /**
  * @brief called by HAL driver to set up clocks and pinmux for UART
 */
@@ -58,4 +63,24 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 	GPIO_InitStruct.Pin = GPIO_PIN_9;
 	GPIO_InitStruct.Alternate = GPIO_AF7_USART3;
 	HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+}
+
+/**
+ * @brief called by HAL driver to deinit clocks and pinmux for UART
+ */
+void HAL_UART_MspDeInit(UART_HandleTypeDef *huart)
+{
+	assert_param(SERIAL_UART == huart);
+	(void)huart;
+
+	HAL_GPIO_DeInit(GPIOD, GPIO_PIN_8);
+	HAL_GPIO_DeInit(GPIOD, GPIO_PIN_9);
+
+	if (__HAL_RCC_GPIOD_IS_CLK_ENABLED()) {
+		__HAL_RCC_GPIOD_CLK_DISABLE();
+	}
+
+	if (__HAL_RCC_USART3_IS_CLK_ENABLED()) {
+		__HAL_RCC_USART3_CLK_DISABLE();
+	}
 }
