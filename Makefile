@@ -28,6 +28,12 @@ sign_app:
 		~/software/starter-stm32/build-app/application.bin \
 		build/app_signed.bin
 
+# Flash an application into the primary slot
 .PHONY: flash_app
 flash_app:
 	$(JLINK_CMD) -commandfile flash_app.jlink
+
+# Flash an application into the secondary slot
+.PHONY: flash_app_secondary
+flash_app_secondary:
+	$(JLINK_CMD) -commandfile flash_app_secondary.jlink
