@@ -30,8 +30,12 @@ target_sources(${PROJECT_NAME} PRIVATE
 
 # MCUboot
 set(MCUBOOT_DIR mcuboot/boot/bootutil)
+set(MCUBOOT_SER_DIR mcuboot/boot/boot_serial)
+set(MCUBOOT_ZCBOR_DIR mcuboot/boot/zcbor)
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${MCUBOOT_DIR}/include
+    ${MCUBOOT_SER_DIR}/include
+    ${MCUBOOT_ZCBOR_DIR}/include
 )
 
 target_sources(${PROJECT_NAME} PRIVATE
@@ -54,6 +58,8 @@ target_sources(${PROJECT_NAME} PRIVATE
     ${MCUBOOT_DIR}/src/swap_priv.h
     ${MCUBOOT_DIR}/src/swap_scratch.c
     ${MCUBOOT_DIR}/src/tlv.c
+    ${MCUBOOT_SER_DIR}/src/boot_serial.c
+    ${MCUBOOT_SER_DIR}/src/zcbor_bulk.c
 )
 
 # Tinycrypt

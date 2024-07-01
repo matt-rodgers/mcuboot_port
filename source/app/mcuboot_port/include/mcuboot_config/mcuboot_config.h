@@ -164,4 +164,9 @@
     do {                   \
     } while (0)
 
+/*
+ * MCUMGR extension commands are not implemented
+ */
+#define MCUBOOT_PERUSER_MGMT_GROUP_ENABLED 0
+
 #endif /* __MCUBOOT_CONFIG_H__ */

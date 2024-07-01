@@ -21,6 +21,7 @@ add_compile_options(
     -Wextra
     -Wno-old-style-declaration
     -Wno-unused-parameter
+    -Wno-sign-compare
     -g3
     -Os
 )
