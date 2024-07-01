@@ -1,6 +1,8 @@
 #ifndef _BASE64_H
 #define _BASE64_H
 
+#include <stdint.h>
+
 /* From Zephyr and Espressif ports */
 #define BASE64_ENCODE_SIZE(in_size) ((((((in_size) - 1) / 3) * 4) + 4) + 1)
 

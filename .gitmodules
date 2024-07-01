@@ -10,3 +10,6 @@
 [submodule "third-party/cmsis_core"]
 	path = third-party/cmsis_core
 	url = https://github.com/STMicroelectronics/cmsis_core.git
+[submodule "third-party/mbedtls"]
+	path = third-party/mbedtls
+	url = git@github.com:Mbed-TLS/mbedtls.git

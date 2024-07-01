@@ -60,6 +60,9 @@ target_sources(${PROJECT_NAME} PRIVATE
     ${MCUBOOT_DIR}/src/tlv.c
     ${MCUBOOT_SER_DIR}/src/boot_serial.c
     ${MCUBOOT_SER_DIR}/src/zcbor_bulk.c
+    ${MCUBOOT_ZCBOR_DIR}/src/zcbor_common.c
+    ${MCUBOOT_ZCBOR_DIR}/src/zcbor_decode.c
+    ${MCUBOOT_ZCBOR_DIR}/src/zcbor_encode.c
 )
 
 # Tinycrypt
@@ -95,4 +98,15 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 target_sources(${PROJECT_NAME} PRIVATE
     ${MBEDTLS_ASN1_DIR}/src/asn1parse.c
     ${MBEDTLS_ASN1_DIR}/src/platform_util.c
+)
+
+# mbedtls base64 functions
+set(MBEDTLS_DIR mbedtls)
+target_include_directories(${PROJECT_NAME} PRIVATE
+    ${MBEDTLS_DIR}/include
+)
+
+target_sources(${PROJECT_NAME} PRIVATE
+    ${MBEDTLS_DIR}/library/base64.c
+    ${MBEDTLS_DIR}/library/constant_time.c
 )

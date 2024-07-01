@@ -169,4 +169,9 @@
  */
 #define MCUBOOT_PERUSER_MGMT_GROUP_ENABLED 0
 
+/**
+ * Serial receive buffer size
+ */
+#define MCUBOOT_SERIAL_MAX_RECEIVE_SIZE 512
+
 #endif /* __MCUBOOT_CONFIG_H__ */

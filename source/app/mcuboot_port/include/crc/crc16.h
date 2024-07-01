@@ -1,6 +1,8 @@
 #ifndef _CRC_16_H
 #define _CRC_16_H
 
+#include <stdint.h>
+
 /* Seed for CRC16 */
 #define CRC16_INITIAL_CRC       0
 
