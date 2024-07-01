@@ -14,8 +14,8 @@
 #define BTN_PRESS_TOTAL_MS  500
 
 static struct boot_uart_funcs uart_funcs = {
-	.read = NULL,
-	.write = NULL
+	.read = serial_read,
+	.write = serial_write
 };
 
 typedef void (*app_entry_t)(void);
@@ -84,5 +84,6 @@ void app_main(void)
 	}
 
 	/* Enter serial recovery mode */
+	LOG("Entering serial recovery mode\n");
 	boot_serial_start(&uart_funcs);
 }

@@ -124,6 +124,14 @@
  */
 #define MCUBOOT_HAVE_LOGGING 1
 
+#define MCUBOOT_LOG_LVL_NONE 0
+#define MCUBOOT_LOG_LVL_ERR  1
+#define MCUBOOT_LOG_LVL_WRN  2
+#define MCUBOOT_LOG_LVL_INF  3
+#define MCUBOOT_LOG_LVL_DBG  4
+
+#define MCUBOOT_LOG_LVL MCUBOOT_LOG_LVL_INF
+
 /*
  * Assertions
  */
@@ -164,10 +172,15 @@
     do {                   \
     } while (0)
 
-/*
+/**
  * MCUMGR extension commands are not implemented
  */
 #define MCUBOOT_PERUSER_MGMT_GROUP_ENABLED 0
+
+/**
+ * Implement echo command
+ */
+#define MCUBOOT_BOOT_MGMT_ECHO 1
 
 /**
  * Serial receive buffer size

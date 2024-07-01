@@ -25,9 +25,36 @@ void serial_init(void)
 	HAL_UART_Init(&serial_uart_handle);
 }
 
-void serial_write(const uint8_t * msg, uint16_t len)
+void serial_write(const char * data, int len)
 {
-    HAL_UART_Transmit(&serial_uart_handle, msg, len, UINT32_MAX);
+	assert_param(len >= 0);
+	assert_param(len <= UINT16_MAX);
+
+    HAL_UART_Transmit(&serial_uart_handle, (const uint8_t *)data, (uint16_t)len, UINT32_MAX);
+}
+
+int serial_read(char * data, int cnt, int *newline)
+{
+	assert_param(cnt > 0);
+	assert_param(cnt <= UINT16_MAX);
+
+	int received = 0;
+	*newline = 0;
+
+	while ((received < cnt) && !(*newline)) {
+		int ret = HAL_UART_Receive(&serial_uart_handle, (uint8_t *)&data[received], 1, UINT32_MAX);
+		if (HAL_OK != ret) {
+			return -1;
+		}
+
+		if ('\n' == data[received]) {
+			*newline = 1;
+		}
+
+		received++;
+	}
+
+	return received;;
 }
 
 void serial_deinit(void)

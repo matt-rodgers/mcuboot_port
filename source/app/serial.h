@@ -5,7 +5,9 @@
 
 void serial_init(void);
 
-void serial_write(const uint8_t * msg, uint16_t len);
+void serial_write(const char * data, int len);
+
+int serial_read(char * data, int cnt, int *newline);
 
 void serial_deinit(void);
 
