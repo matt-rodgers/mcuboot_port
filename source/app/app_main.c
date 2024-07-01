@@ -6,11 +6,17 @@
 #include "log.h"
 #include "bootutil/bootutil.h"
 #include "sysflash/sysflash.h"
+#include "boot_serial/boot_serial.h"
 #include "core_cm4.h"
 #include "app_main.h"
 
 #define BTN_CHECK_INTV_MS   10
 #define BTN_PRESS_TOTAL_MS  500
+
+static struct boot_uart_funcs uart_funcs = {
+	.read = NULL,
+	.write = NULL
+};
 
 typedef void (*app_entry_t)(void);
 
@@ -78,8 +84,5 @@ void app_main(void)
 	}
 
 	/* Enter serial recovery mode */
-	while (1) {
-		led_toggle();
-		HAL_Delay(100);
-	}
+	boot_serial_start(&uart_funcs);
 }
