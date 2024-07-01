@@ -16,3 +16,9 @@ Build the image in that repo and then use `make sign_app` to process and sign th
 If flashing the application directly into the primary slot, it should also be confirmed (`--confirm`) using `imgtool`.
 
 Loading a confirmed image into the secondary slot is also possible, and means that it will be swapped permanently into the primary slot on the next boot without the application having to trigger the update.
+
+### Serial recovery mode
+
+Serial recovery mode can be entered by holding the USER button while resetting the board.
+
+The MCUmgr protocol is used, various client applications exist but I've only tested with this one: https://github.com/vouch-opensource/mcumgr-client
